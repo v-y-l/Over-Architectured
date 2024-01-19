@@ -44,7 +44,7 @@ def post_user():
 @app.route('/v1/movie', methods=['GET'])
 def get_movie():
     movies = Movie.query.all()
-    return ', '.join([m.movie_name for m in movies])
+    return ', '.join([str(m.movie_id) + ": " + m.movie_name for m in movies])
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
