@@ -56,9 +56,7 @@ def get_movie():
 def get_movie_metadata():
     cursor = metadata_collection.find()
     all_data = list(cursor)
-    print(all_data)
-    print(metadata_collection.count_documents({}))
-    return jsonify({'metadata': all_data})
+    return jsonify({'metadata': all_data, 'count': metadata_collection.count_documents({})})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
