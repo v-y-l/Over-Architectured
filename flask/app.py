@@ -29,7 +29,7 @@ class Query(ObjectType):
     movie = Field(gs.Movie, id=ID(required=True))
 
     def resolve_movie(self, info, id):
-        m = Movie.query.filter_by(id=id).first()
+        m = Movie.query.filter_by(movie_id=id).first()
         return gs.Movie(id=m.movie_id, name=m.movie_name) 
 
 schema = Schema(query=Query)
