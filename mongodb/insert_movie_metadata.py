@@ -5,7 +5,7 @@ client = MongoClient("mongodb://localhost:27017")  # Replace with your MongoDB c
 
 # This is like a default dict. Doesn't exist? Will instantiate
 db = client.movie
-collection = db.metedata
+collection = db.metadata
 
 document = {
     "_id": "1", # Make this match the SQL movie db
