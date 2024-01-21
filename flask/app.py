@@ -1,6 +1,9 @@
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from pymongo import MongoClient
+from graphene import ObjectType, String, ID, Schema, Field
+from flask_graphql import GraphQLView
+import graphql_schema as gs
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://vyl@localhost/movie_db'
@@ -19,6 +22,17 @@ class Movie(sql_db.Model):
 mongo_client = MongoClient("mongodb://localhost:27017/")  # Update with your MongoDB connection string
 mongo_db = mongo_client["movie"]
 metadata_collection = mongo_db["metadata"]
+
+# GraphQL setup
+class Query(ObjectType):
+    # This is what we'll request from the user
+    movie = Field(gs.Movie, id=ID(required=True))
+
+    def resolve_movie(self, info, id):
+        m = Movie.query.filter_by(id=id).first()
+        return gs.Movie(id=m.movie_id, name=m.movie_name) 
+
+schema = Schema(query=Query)
 
 @app.route('/')
 def hello_world():
@@ -58,11 +72,12 @@ def get_movie_metadata():
     all_data = list(cursor)
     return jsonify({'metadata': all_data, 'count': metadata_collection.count_documents({})})
 
+# graphql end points are interesting, namely because you just need one.
+# This is very different than rest.
+
+# curl -X POST -H "Content-Type: application/json" -d '{"query":"{ movie(id: \"1\") { id, name } }"}' http://127.0.0.1:5000/graphql
+
+app.add_url_rule('/graphql', view_func=GraphQLView.as_view('graphql', schema=schema, graphiql=True))
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
-
-
-
-
-
-
